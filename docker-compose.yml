@@ -32,8 +32,8 @@ services:
     image: nginx:alpine
     container_name: laravel-web-1
     restart: unless-stopped
-    ports:
-      - "80:80" # Port ini akan di-proxy oleh Nginx Proxy Manager
+  # ports:
+  #   - "80:80" # Port ini akan di-proxy oleh Nginx Proxy Manager
     volumes:
       - .:/var/www/html
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
