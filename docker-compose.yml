@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # Container Aplikasi Laravel (PHP-FPM)
+  app:
+    build:
+      context: ./docker/laravel
+    container_name: laravel-app-1
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+    networks:
+      - proxy_network
+      - internal_network
+    environment:
+      # Variabel Lingkungan Laravel
+      - APP_NAME=Laravel Project 1
+      - APP_ENV=production
+      - APP_DEBUG=true
+      - APP_URL=http://1.rhandyta.my.id
+      - LOG_CHANNEL=stderr
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql_server # Nama service container MySQL
+      - DB_PORT=3306
+      - DB_DATABASE=laravel_project1_db # Database khusus untuk proyek ini
+      - DB_USERNAME=root
+      - DB_PASSWORD=wadah1
+      - VITE_APP_NAME='Laravel Project 1'
+
+  # Web Server (Nginx)
+  webserver:
+    image: nginx:alpine
+    container_name: laravel-web-1
+    restart: unless-stopped
+    ports:
+      - "80:80" # Port ini akan di-proxy oleh Nginx Proxy Manager
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - proxy_network # Terhubung ke Nginx Proxy Manager
+      - internal_network # Terhubung ke container app (PHP-FPM)
+
+  # Database MySQL
+  # Catatan: Kita tidak mendefinisikan MySQL di sini karena sudah ada di stack lain
+  # Namun kita perlu mendefinisikan network agar bisa terhubung
+
+networks:
+  proxy_network:
+    external: true
+  internal_network:
+    driver: bridge
